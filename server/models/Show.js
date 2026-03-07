@@ -1,3 +1,5 @@
+//  Show model to represent a movie showtime, including the movie, price, date/time, and occupied seats.
+
 import mongoose from "mongoose";
 
 const showSchema = new mongoose.Schema(
