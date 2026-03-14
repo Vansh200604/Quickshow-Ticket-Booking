@@ -3,12 +3,14 @@ import { Link, useNavigate, NavLink} from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { SearchIcon, MenuIcon, XIcon, TicketPlus } from 'lucide-react'
 import { useClerk, useUser, UserButton } from '@clerk/clerk-react'
+import { useAppContext } from '../context/AppContext'
 
 function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const {user} = useUser()
     const {openSignIn} = useClerk()
     const navigate = useNavigate()
+    const {favoriteMovies} = useAppContext();
   return (
     <div className="fixed top-0 left-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5">
 
@@ -37,7 +39,11 @@ function Navbar() {
         <NavLink onClick={() => {scrollTo(0,0); setIsOpen(!isOpen)}} to="/movies" className={({isActive}) => `hover:underline ${isActive ? 'text-white-700 underline' : ''}`}>Movies</NavLink>
         <NavLink onClick={() => {scrollTo(0,0); setIsOpen(!isOpen)}} to="/theaters" className={({isActive}) => `hover:underline ${isActive ? 'text-white-700 underline' : ''}`}>Theaters</NavLink>
         <NavLink onClick={() => {scrollTo(0,0); setIsOpen(!isOpen)}} to="/release" className={({isActive}) => `hover:underline ${isActive ? 'text-white-700 underline' : ''}`}>Release</NavLink>
-        <NavLink onClick={() => {scrollTo(0,0); setIsOpen(!isOpen)}} to="/favorite" className={({isActive}) => `hover:underline ${isActive ? 'text-white-700 underline' : ''}`}>Favorite</NavLink>
+        {favoriteMovies.length > 0 && (
+            <NavLink onClick={() => {scrollTo(0,0); setIsOpen(!isOpen)}} to="/favorite" className={({isActive}) => `hover:underline ${isActive ? 'text-white-700 underline' : ''}`}>
+                Favorite ({favoriteMovies.length})
+            </NavLink>
+        )}
       </div>
 
       <div className="flex items-center gap-8">

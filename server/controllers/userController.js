@@ -28,15 +28,19 @@ export const updateFavorite = async(req, res) => {
         if(!user.privateMetadata.favorites){
             user.privateMetadata.favorites = [];
         }
+        
+        let message = "";
         if(user.privateMetadata.favorites.includes(movieId)){
-            user.privateMetadata.favorites.push(movieId);
+            user.privateMetadata.favorites = user.privateMetadata.favorites.filter(id => id !== movieId);
+            message = "Movie removed from favorites";
         }
         else{
-            user.privateMetadata.favorites = user.privateMetadata.favorites.filter(id => id !== movieId);
+            user.privateMetadata.favorites.push(movieId);
+            message = "Movie added to favorites successfully";
         }
 
         await clerkClient.users.updateUserMetadata(userId, {privateMetadata: user.privateMetadata});
-        res.json({success: true, message: "Movie added to favorites successfully"})
+        res.json({success: true, message: message})
     }
     catch(error){
         console.error("Error updating favorite movie in userController:", error);
