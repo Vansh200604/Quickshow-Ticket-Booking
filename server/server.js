@@ -8,6 +8,8 @@ import { serve } from 'inngest/express';
 import { functions, inngest } from './inngest/index.js';
 import showRouter from './routers/showRouters.js';
 import bookingRouter from './routers/bookingRouter.js';
+import adminRouter from './routers/adminRouter.js';
+import userRouter from './routers/userRouter.js';
 
 const app = express();
 const port = 3000;
@@ -15,9 +17,9 @@ const port = 3000;
 await connectDB();
 
 //Middleware
-app.use(clerkMiddleware());
+app.use(cors());
 app.use(express.json());
-app.use(cors());    
+app.use(clerkMiddleware());    
 
 
 // API Routes
@@ -33,5 +35,7 @@ app.get('/api/protected', requireAuth, async(req, res) => {
 app.use('/api/inngest', serve({client: inngest, functions}))
 app.use('/api/show', showRouter);
 app.use('/api/booking', bookingRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/user', userRouter);
 
 app.listen(port, () => console.log(`Server listening at http://localhost:${port}`));

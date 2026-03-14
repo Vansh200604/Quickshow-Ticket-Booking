@@ -5,8 +5,14 @@ import Loading from '../../components/Loading';
 import Title from '../../components/admin/Title';
 import BlurCircle from '../../components/BlurCircle';
 import ShowCard from '../../components/admin/ShowCard';
+import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
+import dateFormat from '../../lib/DateFormat';
 
 function Dashboard() {
+
+    const {axios, getToken, user, image_base_url} = useAppContext();
+
     const currency = import.meta.env.VITE_CURRENCY;
     
     const [dashboardData, setDashboardData] = useState({
@@ -25,13 +31,33 @@ function Dashboard() {
     ]
     
     const fetchDashboardData = async () => {
-        setDashboardData(dummyDashboardData);
-        setLoading(false);
+        try{
+            setLoading(true);
+            const {data} = await axios.get('/api/admin/dashboard', {
+                headers: {
+                    Authorization: `Bearer ${await getToken()}`
+                }
+            })
+            if(data.success){
+                setDashboardData(data.dashboardData);
+                toast.success("Dashboard data fetched successfully");    
+                setLoading(false);
+            }
+            else{
+                toast.error(data.message || "Failed to fetch dashboard data");
+            }
+        }
+        catch(error){
+            toast.error("Error fetching dashboard data", error);
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
-        fetchDashboardData();
-    }, [])
+        if(user){
+            fetchDashboardData();
+        }
+    }, [user])
 
     return !loading ?  (
         <>
@@ -42,7 +68,7 @@ function Dashboard() {
 
                 <div className='flex flex-wrap gap-4 w-full '>
                     {dashboardCards.map((card, index) => (
-                        <div key={index} className='flex item-center justify-between px-4  py-3 bg-primary/10 
+                        <div key={index} className='flex items-center justify-between px-4  py-3 bg-primary/10 
                         border border-primary/20 rounded-md max-w-50 w-full'>
 
                             <div>
@@ -58,14 +84,31 @@ function Dashboard() {
 
             </div>
 
+
             <p className='mt-10 text-lg font-medium'>Active Shows</p>
 
             <div className='relative flex flex-wrap gap-6 mt-4 max-w-5xl '>
                 <BlurCircle top='100px' left='-10%' />
 
                 {
-                    dummyDashboardData.activeShows.map((show) => (
-                        <ShowCard key={show._id} show={show} currency={currency} />
+                    dashboardData.activeShows.map((show) => (
+                        <div key={show._id } className='w-55 rounded-lg overflow-hidden h-full pb-3 bg-primary/10
+                        border border-primary/20 hover:-translate-y-1 transition duration-300'>
+
+                            <img src={image_base_url + show.movie.poster_path} alt='' className='h-60 w-full object-cover' />
+                            <p className='font-medium p-2 truncate'>{show.movie.title}</p>
+                            <div>
+                                <p>{currency} {show.showPrice}</p>
+                                <p className='flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1 '>
+                                    <StarIcon className='w-4 h-4 text-primary fill-primary' />
+                                    {show.movie.vote_average.toFixed(1) || "0.0"}
+                                </p>
+
+                            </div>
+                            <p className='px-2 pt-2 text-sm text-gray-500'>{dateFormat(show.showDateTime)}</p>
+
+                        </div>
+
                     ))
                 }
 

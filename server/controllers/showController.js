@@ -25,6 +25,10 @@ export const addShow = async(req, res) =>{
     try{
         const {movieId, showsInput, showPrice} = req.body;
 
+        if(!movieId || !showsInput || !Array.isArray(showsInput) || !showPrice){
+            return res.status(400).json({success: false, message: "Invalid input: movieId, showsInput array, and showPrice are required"});
+        }
+
         let movie = await Movie.findById(movieId);
         if(!movie){
             //Fetch movie details from TMDB API

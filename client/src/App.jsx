@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
@@ -18,11 +16,15 @@ import AddShows from './pages/admin/AddShows'
 import ListShows from './pages/admin/ListShows'
 import ListBookings from './pages/admin/ListBookings'
 import Layout from './pages/admin/Layout'
+import { SignIn } from '@clerk/clerk-react'
+import { useAppContext } from './context/AppContext'
 
 
 function App() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = useLocation().pathname.startsWith('/admin');
+
+  const {user} = useAppContext();
 
   const [loading, setLoading] = useState(false);
 
@@ -37,6 +39,7 @@ function App() {
 
   return (
     <>
+      <Toaster />
         {<Loading show={loading} />}
         {!isAdminRoute && <NavBar />}
         <Routes>
@@ -47,7 +50,11 @@ function App() {
           <Route path='/my-bookings' element={<MyBookings />} />
           <Route path='/favorite' element={<Favorite />} />
 
-          <Route path='/admin/*' element={<Layout />} >
+          <Route path='/admin/*' element={ user ? <Layout /> : (
+            <div className='min-h-screen flex justify-center items-center'>
+              <SignIn fallbackRedirectUrl={'/admin'}/>
+            </div>
+          )} >
             <Route index element={<Dashboard />} />
             <Route path='add-shows' element={<AddShows />} />
             <Route path='list-shows' element={<ListShows />} />
@@ -56,7 +63,7 @@ function App() {
 
         </Routes>
         {!isAdminRoute && <Footer />}
-        <Toaster />
+      <Toaster />
       
 
       
