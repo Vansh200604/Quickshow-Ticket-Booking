@@ -18,7 +18,7 @@ export const checkSeatsAvailability = async(showId, selectedSeats) => {
 }
 
 export const createBooking = async(req, res) => {
-    try{
+    try{    
         const {userId} = req.auth();
         const {showId, selectedSeats} = req.body;
 
@@ -37,9 +37,9 @@ export const createBooking = async(req, res) => {
             user: userId,
             show: showId,
             amount: showData.showPrice * selectedSeats.length,
-            bookedSeats: selectedSeats  
-        })
-
+            bookedSeats: selectedSeats,
+            isPaid: false
+        });
         // Update the occupied seats for the show
         selectedSeats.map((seats) => {
             showData.occupiedSeats[seats] = userId;
@@ -50,7 +50,36 @@ export const createBooking = async(req, res) => {
         await showData.save();
 
         // Stripe Gateway Initialize 
-        res.json({success: true, message: "Booked successfully", bookingId: booking._id})
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+
+        //Creating line items to for Stripe
+        const line_items = [{
+            price_data: {
+                currency: 'usd',
+                product_data: {
+                    name: showData.movie.title
+                },
+                unit_amount: Math.floor(booking.amount) * 100
+            },
+            quantity: 1
+        }]
+
+        // Create Stripe Checkout Session
+        const session = await stripeInstance.checkout.sessions.create({
+            success_url: `${orgin}/loading/my-bookings`,
+            cancel_url: `${orgin}/my-bookings`,
+            line_items: line_items,
+            mode: 'payment',
+            metadata: {
+                bookingId: booking._id.toString()
+            },
+            expires_at: Math.floor(Date.now()/1000) + 30*60 //Expires in 30minutes
+        })
+
+        booking.paymentLink = session.url;
+        await booking.save();
+
+        res.json({success: true, url: session.url})
 
     }
     catch(error){
@@ -63,7 +92,14 @@ export const createBooking = async(req, res) => {
 export const getOccupiedSeats = async(req, res) => {
     try{
         const {showId} = req.params;
+        
         const showData = await Show.findById(showId);
+        if (!showData) {
+            return res.json({
+                success: false,
+                message: "Show not found"
+            });
+        }
         const occupiedSeats = Object.keys(showData.occupiedSeats);
         res.json({success: true, occupiedSeats});
     }

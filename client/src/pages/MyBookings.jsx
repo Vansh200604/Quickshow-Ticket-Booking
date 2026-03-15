@@ -5,6 +5,7 @@ import TimeFormat from '../lib/TimeFormat';
 import DateFormat from '../lib/DateFormat';
 import { UserButton } from '@clerk/clerk-react';
 import { BottleWineIcon } from 'lucide-react';
+import { useAppContext } from '../context/appContext';
 
 
 function MyBookings() {
@@ -12,14 +13,30 @@ function MyBookings() {
     const [bookings, setBookings] = useState([]);
     const [isLoading, setLoading] = useState(true);
 
+    const {axios, getToken, user, image_base_url} = useAppContext();
+
     const getMyBookings = async () => {
-        setBookings(dummyBookingData)
+        try{
+            const {data} = await axios.get('/api/user/bookings', {
+                headers: {
+                    Authorization: `Bearer ${await getToken()}`
+                }
+            })
+            if(data.success){
+                setBookings(data.bookings);
+            }
+        }
+        catch(error){
+            console.error("Error fetching user bookings in MyBookings.jsx:", error);
+        }
         setLoading(false);
     }
 
     useEffect(() => {
-        getMyBookings();
-    }, []);
+        if(user){
+            getMyBookings();
+        }
+    }, [user]);
 
 
     return !isLoading ?  (
@@ -35,7 +52,7 @@ function MyBookings() {
                  border-primary/20 rounded-lg mt-4 p-2 max-w-3xl'>
 
                     <div className='flex flex-col md:flex-row'>
-                        <img src={item.show.movie.poster_path} alt=""  className='md:max-w-45 aspect-video h-auto
+                        <img src={image_base_url + item.show.movie.poster_path} alt=""  className='md:max-w-45 aspect-video h-auto
                         object-cover object-bottom rounded'/>
 
                         <div className='flex flex-col p-4'>
