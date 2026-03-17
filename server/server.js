@@ -10,10 +10,15 @@ import showRouter from './routers/showRouters.js';
 import bookingRouter from './routers/bookingRouter.js';
 import adminRouter from './routers/adminRouter.js';
 import userRouter from './routers/userRouter.js';
+import { stripeWebhooks } from './controllers/stripeWebHooks.js';
+
 const app = express();
 const port = 3000;
 
 await connectDB();
+
+// Stripe webhook endpoint (must be BEFORE express.json())
+app.post('/api/stripe/webhook', express.raw({type: 'application/json'}), stripeWebhooks);
 
 //Middleware
 app.use(cors());
