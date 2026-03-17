@@ -2,15 +2,23 @@ import stripe from 'stripe';
 import Booking from '../models/Booking.js';
 
 export const stripeWebhooks = async(req, res) => {
-    const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+    // Initialize Stripe WITHOUT 'new' keyword
+    const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
     const sig = req.headers['stripe-signature'];
 
     let event;
     try{
-        event = stripeInstance.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        // req.body should be a Buffer when using express.raw()
+        const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+        
+        event = stripeInstance.webhooks.constructEvent(
+            body, 
+            sig, 
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
     }
     catch(error){
-        console.error("Error is in processing stripe webhook:", error);
+        console.error("Error is in processing stripe webhook:", error.message);
         return res.status(400).send(`Webhook Error: ${error.message}`);
     }
     try{
@@ -19,11 +27,17 @@ export const stripeWebhooks = async(req, res) => {
                 const session = event.data.object;
                 const {bookingId} = session.metadata;
 
+                if(!bookingId){
+                    console.warn("No bookingId found in metadata");
+                    break;
+                }
+
                 // Update booking as paid
-                await Booking.findByIdAndUpdate(bookingId, {
+                const updatedBooking = await Booking.findByIdAndUpdate(bookingId, {
                     isPaid: true,
                     paymentLink: ""
-                })
+                }, {new: true});
+                
                 console.log(`✅ Booking ${bookingId} marked as paid`);
                 break;
             }
@@ -36,7 +50,7 @@ export const stripeWebhooks = async(req, res) => {
         res.json({ received: true });
     }
     catch(error){
-        console.error("webhook processing error:", error);
+        console.error("webhook processing error:", error.message);
         res.status(500).send("Internal Server Error webhooks");
     }
 }
