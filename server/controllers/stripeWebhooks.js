@@ -1,6 +1,10 @@
 import Stripe from 'stripe';
 import Booking from '../models/Booking.js';
 
+if(!process.env.STRIPE_SECRET_KEY){
+    console.error("Stripe secret key is not defined in environment variables.");
+}
+
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const stripeWebHooks = async(req, res) => {
