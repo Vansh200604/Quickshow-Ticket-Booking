@@ -109,7 +109,7 @@ function Seatlayout() {
 
             if(data.success){
                 window.location.href = data.url;
-                toast.success("Tickets booked successfully!", data.message);
+                toast.success(" Go to Payment!", data.message);
                 
             }   
             else{

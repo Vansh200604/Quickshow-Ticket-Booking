@@ -6,6 +6,7 @@ import DateFormat from '../lib/DateFormat';
 import { UserButton } from '@clerk/clerk-react';
 import { BottleWineIcon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { Link } from 'react-router-dom';
 
 
 function MyBookings() {
@@ -65,8 +66,8 @@ function MyBookings() {
                     <div className='flex flex-col md:items-end md:text-right justify-between p-4'>
                         <div className='flex items-center gap-4'>
                             <p className='text-2xl font-semibold mb-3'>{currency}{item.amount}</p>
-                            {!item.isPaid && <button className='bg-primary px-4 py-1.5 mb-3 text-sm
-                            rounded-full font-medium cursor-pointer'> Pay Now</button>}
+                            {!item.isPaid && <Link to={item.paymentLink} className='bg-primary px-4 py-1.5 mb-3 text-sm
+                            rounded-full font-medium cursor-pointer'> Pay Now</Link>}
                         </div>
                         <div>
                             <p><span className='text-gray-400'>Total Tickets: </span> {item.bookedSeats.length}</p>

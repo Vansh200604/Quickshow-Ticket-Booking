@@ -36,6 +36,10 @@ app.get('/api/protected', requireAuth, async(req, res) => {
     return res.json({message: `Welcome ${user.firstName} ${user.lastName}! This is a protected route.`});
 });
 
+app.get("/test", (req, res) => {
+  res.send("Backend working");
+});
+
 app.use('/api/inngest', serve({client: inngest, functions}))
 app.use('/api/show', showRouter);
 app.use('/api/booking', bookingRouter);
