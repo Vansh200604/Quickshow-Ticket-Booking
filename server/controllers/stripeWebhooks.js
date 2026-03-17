@@ -1,12 +1,13 @@
 import Stripe from 'stripe';
 import Booking from '../models/Booking.js';
 
-if(!process.env.STRIPE_SECRET_KEY){
-    console.error("Stripe secret key is not defined in environment variables.");
-}
+
 
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
-
+if(process.env.STRIPE_SECRET_KEY){
+    console.log(process.env.STRIPE_SECRET_KEY);
+    console.log("Stripe secret key is defined in environment variables.");
+}
 export const stripeWebHooks = async(req, res) => {
     // Initialize Stripe WITHOUT 'new' keyword
     
