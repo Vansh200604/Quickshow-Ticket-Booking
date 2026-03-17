@@ -5,7 +5,7 @@ import TimeFormat from '../lib/TimeFormat';
 import DateFormat from '../lib/DateFormat';
 import { UserButton } from '@clerk/clerk-react';
 import { BottleWineIcon } from 'lucide-react';
-import { useAppContext } from '../context/appContext';
+import { useAppContext } from '../context/AppContext';
 
 
 function MyBookings() {
@@ -67,6 +67,7 @@ function MyBookings() {
                             <p className='text-2xl font-semibold mb-3'>{currency}{item.amount}</p>
                             {!item.isPaid && <button className='bg-primary px-4 py-1.5 mb-3 text-sm
                             rounded-full font-medium cursor-pointer'> Pay Now</button>}
+                            
                         </div>
                         <div>
                             <p><span className='text-gray-400'>Total Tickets: </span> {item.bookedSeats.length}</p>

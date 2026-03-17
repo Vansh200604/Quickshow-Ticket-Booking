@@ -54,14 +54,12 @@ function ListBookings() {
                         {
                             bookings.map((item, index) =>  (
                                 <tr key={index} className='border-b border-primary/20
-                                 bg-primary/5 even bg-primary/10'>
-
-                                    <td className='p-2 min-w-45 pl-5'                                                                                                                                           >{item.user.name}</td>
-                                    <td  className='p-2'>{item.show.movie.title}</td>
+                                 bg-primary/5 even:bg-primary/10'>
+                                    <td className='p-2 min-w-45 pl-5'>{item.user.name}</td>                                                                                                                                    
                                     <td className='text-sm'>{DateFormat(item.show.showDateTime)}</td>
                                     <td className='p-2 '>{Object.keys(item.bookedSeats).map(seat => item.bookedSeats[seat]).join(", ")}</td>
                                     <td className='p-2'>{currency}{item.amount}</td>
-                                 </tr>
+                                </tr>
                             ))
                         }
 

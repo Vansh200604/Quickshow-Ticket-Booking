@@ -1,5 +1,6 @@
 import Show from "../models/Show.js";
 import Booking from "../models/Booking.js";
+import stripe from 'stripe';
 
 export const checkSeatsAvailability = async(showId, selectedSeats) => {
     try{
@@ -50,6 +51,7 @@ export const createBooking = async(req, res) => {
         await showData.save();
 
         // Stripe Gateway Initialize 
+        const origin = req.headers.origin;
         const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
         //Creating line items to for Stripe
@@ -66,8 +68,8 @@ export const createBooking = async(req, res) => {
 
         // Create Stripe Checkout Session
         const session = await stripeInstance.checkout.sessions.create({
-            success_url: `${orgin}/loading/my-bookings`,
-            cancel_url: `${orgin}/my-bookings`,
+            success_url: `${origin}/loading/my-bookings`,
+            cancel_url: `${origin}/my-bookings`,
             line_items: line_items,
             mode: 'payment',
             metadata: {

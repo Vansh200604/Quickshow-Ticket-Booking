@@ -7,7 +7,7 @@ import Loading from '../components/Loading.jsx';
 import isoTimeFormat from '../lib/isoTimeFormat.js';
 import BlurCircle from '../components/BlurCircle.jsx';
 import { toast } from 'react-hot-toast';
-import { useAppContext } from '../context/appContext.jsx';
+import { useAppContext } from '../context/AppContext';
 
 
 function Seatlayout() {
@@ -108,8 +108,9 @@ function Seatlayout() {
             })
 
             if(data.success){
+                window.location.href = data.url;
                 toast.success("Tickets booked successfully!", data.message);
-                navigate('/my-bookings');
+                
             }   
             else{
                 toast.error(data.message || "Error booking tickets");
