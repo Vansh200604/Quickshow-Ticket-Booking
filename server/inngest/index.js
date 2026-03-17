@@ -70,6 +70,7 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
                 await show.save();
                 await show.save();
                 await Booking.findByIdAndDelete(bookingId);
+                console.log(`Booking ${bookingId} cancelled and seats released due to non-payment.`);
             }
         })
     }
