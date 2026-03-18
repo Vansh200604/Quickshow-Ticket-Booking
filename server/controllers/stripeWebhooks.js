@@ -38,6 +38,12 @@ export const stripeWebHooks = async(req, res) => {
                     isPaid: true,
                     paymentLink: "",
                 }, {new: true});
+
+                // Send Confirmation Email to user
+                await inngest.send({
+                    name: 'app/show.booked',
+                    data: {bookingId}
+                })
                 
                 console.log(`✅ Booking ${bookingId} marked as paid`);
                 break;
