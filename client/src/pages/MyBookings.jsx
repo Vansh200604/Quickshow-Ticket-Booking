@@ -7,6 +7,7 @@ import { UserButton } from '@clerk/clerk-react';
 import { BottleWineIcon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
+import Loading from '../components/Loading';    
 
 
 function MyBookings() {
@@ -81,7 +82,7 @@ function MyBookings() {
 
         </div>
     ) : (
-        <div></div>
+        <Loading show={isLoading} />
     )
 }
 
